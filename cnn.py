@@ -13,7 +13,7 @@ class CNN(nn.Module):
         self.relu2 = nn.ReLU()  # torch.Size([1, 64, 12, 12])
         self.batch_norm2 = nn.BatchNorm2d(num_features=64)  # torch.Size([1, 64, 12, 12])
         self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)  # torch.Size([1, 64, 6, 6])
-        # nn.Dropout(),
+        self.do1 = nn.Dropout()
         self.fc1 =  nn.Linear(64*6*6, 1024)
         self.relu3 = nn.ReLU()
         self.fc2 = nn.Linear(in_features=1024, out_features=10)
@@ -23,6 +23,7 @@ class CNN(nn.Module):
         x = self.pool1(self.batch_norm1(x))
         x = self.relu2(self.conv2(x))
         x = self.pool2(self.batch_norm2(x))
+        x = self.do1(x)
         x = x.view(-1, 64*6*6)
         x = self.relu3(self.fc1(x))
         x = self.fc2(x)

@@ -56,4 +56,14 @@ for epoch in range(NUM_EPOCH):
                       .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(),
                               (correct / total) * 100))
 
-torch.save(net.state_dict(), 'mnnist.pth')
+            if i % 600 == 0:
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': net.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': loss,
+                }, 'mnnist{:d}_{:d}.pth'.format(epoch, i))
+
+torch.save({
+    'model_state_dict': net.state_dict()
+})
