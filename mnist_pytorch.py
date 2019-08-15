@@ -6,6 +6,9 @@ from torch.utils.data import *
 
 import cnn
 
+NUM_EPOCH = 5
+BATCH_SIZE = 100
+
 transform = transforms.Compose(
     [
         transforms.RandomCrop(28, padding=4, pad_if_needed=False, fill=0, padding_mode='constant'),
@@ -17,36 +20,38 @@ transform = transforms.Compose(
 )
 
 train_set = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
-train_loader = DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
+train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
 val_set = torchvision.datasets.FashionMNIST(root='./', train=False, download=False, transform=transform)
-val_loader = DataLoader(val_set, batch_size=4, shuffle=False, num_workers=2)
+val_loader = DataLoader(val_set, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
 
 net = cnn.CNN()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
 
-for epoch in range(2):  # loop over the dataset multiple times
+total_step = len(train_loader)
+loss_list = []
+acc_list = []
 
-    running_loss = 0.0
-    for i, data in enumerate(train_loader, 0):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = data
+for epoch in range(NUM_EPOCH):
+    for i, (images, labels) in enumerate(train_loader):
+            # Run the forward pass
+            outputs = net(images)
+            loss = criterion(outputs, labels)
+            loss_list.append(loss.item())
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
+            # Backprop and perform Adam optimisation
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        # forward + backward + optimize
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+            # Track the accuracy
+            total = labels.size(0)
+            _, predicted = torch.max(outputs.data, 1)
+            correct = (predicted == labels).sum().item()
+            acc_list.append(correct / total)
 
-        # print statistics
-        running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
-
-print('Finished Training')
+            if (i + 1) % 100 == 0:
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
+                      .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(),
+                              (correct / total) * 100))
