@@ -55,3 +55,5 @@ for epoch in range(NUM_EPOCH):
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
                       .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(),
                               (correct / total) * 100))
+
+torch.save(net.state_dict(), 'mnnist.pth')
