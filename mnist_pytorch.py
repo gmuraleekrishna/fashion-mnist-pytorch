@@ -23,7 +23,7 @@ transform = transforms.Compose(
 # val_loader = DataLoader(mnist_dataset, batch_size=50,sampler=SubsetRandomSampler(valid_idx), num_workers=0)
 # test_loader = DataLoader(mnist_dataset, batch_size=50,sampler=SubsetRandomSampler(valid_idx), num_workers=0)
 
-train_set = torchvision.datasets.FashionMNIST(root='./', train=True, download=False, transform=transform)
+train_set = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
 train_loader = DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
 
 val_set = torchvision.datasets.FashionMNIST(root='./', train=False, download=False, transform=transform)
@@ -31,7 +31,7 @@ val_loader = DataLoader(val_set, batch_size=4, shuffle=False, num_workers=2)
 
 net = cnn.CNN()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
 # output = net(torch.rand(1, 1, 28, 28))
 # print(output.shape)
 for epoch in range(2):  # loop over the dataset multiple times
