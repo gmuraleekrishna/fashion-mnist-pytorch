@@ -23,10 +23,10 @@ transform = transforms.Compose(
 # val_loader = DataLoader(mnist_dataset, batch_size=50,sampler=SubsetRandomSampler(valid_idx), num_workers=0)
 # test_loader = DataLoader(mnist_dataset, batch_size=50,sampler=SubsetRandomSampler(valid_idx), num_workers=0)
 
-train_set = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
+train_set = torchvision.datasets.FashionMNIST(root='./FashionMNIST', train=True, download=True, transform=transform)
 train_loader = DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
 
-val_set = torchvision.datasets.FashionMNIST(root='./', train=False, download=False, transform=transform)
+val_set = torchvision.datasets.FashionMNIST(root='./FashionMNIST', train=False, download=False, transform=transform)
 val_loader = DataLoader(val_set, batch_size=4, shuffle=False, num_workers=2)
 
 net = cnn.CNN()
