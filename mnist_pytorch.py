@@ -85,7 +85,7 @@ for epoch in range(NUM_EPOCH):
 
         _, pred_label = torch.max(outputs.data, 1)
         # smooth average
-        ave_loss = ave_loss * 0.9 + loss.data[0] * 0.1
+        ave_loss = ave_loss * 0.9 + loss.item() * 0.1
 
         if (batch_idx + 1) % 100 == 0 or (batch_idx + 1) == len(val_loader):
             print
@@ -93,5 +93,5 @@ for epoch in range(NUM_EPOCH):
                 epoch, batch_idx + 1, ave_loss, correct * 1.0 / total)
 torch.save({
     'model_state_dict': net.state_dict()
-})
+}, 'mnist_final.pth')
 
