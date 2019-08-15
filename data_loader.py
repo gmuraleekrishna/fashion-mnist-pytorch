@@ -12,15 +12,16 @@ transform = transforms.Compose(
     ]
 )
 
-def load_data():
+
+def load_data(batch_size):
     train_set = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
     num_train = len(train_set)
     indices = list(range(num_train))
 
-    train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True,
+    train_loader = DataLoader(train_set, batch_size=batch_size,
                               num_workers=2, sampler=SubsetRandomSampler(indices[59000:]))
 
     val_set = torchvision.datasets.FashionMNIST(root='./', train=False, download=False, transform=transform)
-    val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
-                            shuffle=False, num_workers=2, sampler=SubsetRandomSampler(indices[:1000]))
+    val_loader = DataLoader(val_set, batch_size=batch_size,
+                            num_workers=2, sampler=SubsetRandomSampler(indices[:1000]))
     return train_loader, val_loader
