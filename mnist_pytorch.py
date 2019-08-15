@@ -1,12 +1,17 @@
 import torch
 from torch import nn, optim  # Contains several Pytorch optimizer classes
 from torch.autograd import Variable
+import argparse
 
 from data_loader import load_data
 import cnn
 
 NUM_EPOCH = 5
 BATCH_SIZE = 100
+
+parser = argparse.ArgumentParser(description='MNIST on pytorch')
+parser.add_argument('--cuda', dest='cuda', action='store_true', help='use cuda')
+args = parser.parse_args()
 
 net = cnn.CNN()
 criterion = nn.CrossEntropyLoss()
@@ -18,13 +23,15 @@ total_step = len(train_loader)
 loss_list = []
 acc_list = []
 
-net.cuda()
+if args.cuda:
+    net.cuda()
 
 for epoch in range(NUM_EPOCH):
     for batch_idx, (images, labels) in enumerate(train_loader):
         # Run the forward pass
-        images, labels = images.cuda(), labels.cuda()
-        images, labels = Variable(images), Variable(labels)
+        if args.cuda:
+            images, labels = images.cuda(), labels.cuda()
+            images, labels = Variable(images), Variable(labels)
         outputs = net(images)
         loss = criterion(outputs, labels)
         loss_list.append(loss.item())
@@ -60,8 +67,9 @@ total_cnt = 0
 for epoch in range(NUM_EPOCH):
     for batch_idx, (images, labels) in enumerate(train_loader):
         # Run the forward pass
-        images, labels = images.cuda(), labels.cuda()
-        images, labels = Variable(images, volatile=True), Variable(labels, volatile=True)
+        if args.cuda:
+            images, labels = images.cuda(), labels.cuda()
+            images, labels = Variable(images, volatile=True), Variable(labels, volatile=True)
         outputs = net(images)
         loss = criterion(outputs, labels)
         loss_list.append(loss.item())
