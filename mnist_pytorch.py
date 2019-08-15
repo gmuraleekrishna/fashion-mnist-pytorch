@@ -6,8 +6,8 @@ import argparse
 from data_loader import load_data
 import cnn
 
-NUM_EPOCH = 5
-BATCH_SIZE = 100
+NUM_EPOCH = 30
+BATCH_SIZE = 650
 
 parser = argparse.ArgumentParser(description='MNIST on pytorch')
 parser.add_argument('--cuda', dest='cuda', action='store_true', help='use cuda')
@@ -52,7 +52,7 @@ for epoch in range(NUM_EPOCH):
                   .format(epoch + 1, NUM_EPOCH, batch_idx + 1, total_step, loss.item(),
                           (correct / total) * 100))
 
-        if batch_idx % 600 == 0:
+        if batch_idx % BATCH_SIZE == 0:
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': net.state_dict(),
@@ -65,7 +65,7 @@ for epoch in range(NUM_EPOCH):
 correct_cnt, ave_loss = 0, 0
 total_cnt = 0
 for epoch in range(NUM_EPOCH):
-    for batch_idx, (images, labels) in enumerate(train_loader):
+    for batch_idx, (images, labels) in enumerate(val_loader):
         # Run the forward pass
         if args.cuda:
             images, labels = images.cuda(), labels.cuda()
@@ -80,18 +80,16 @@ for epoch in range(NUM_EPOCH):
 
         # Track the accuracy
         total = labels.size(0)
+        _, predicted = torch.max(outputs.data, 1)
         correct = (predicted == labels).sum().item()
         acc_list.append(correct / total)
 
-        _, pred_label = torch.max(outputs.data, 1)
         # smooth average
         ave_loss = ave_loss * 0.9 + loss.item() * 0.1
 
         if (batch_idx + 1) % 100 == 0 or (batch_idx + 1) == len(val_loader):
-            print
-            '==>>> epoch: {}, batch index: {}, test loss: {:.6f}, acc: {:.3f}'.format(
-                epoch, batch_idx + 1, ave_loss, correct * 1.0 / total)
+            print('==>>> epoch: {}, batch index: {}, test loss: {:.6f}, acc: {:.3f}'.format(
+                epoch, batch_idx + 1, ave_loss, correct * 1.0 / total))
 torch.save({
     'model_state_dict': net.state_dict()
 }, 'mnist_final.pth')
-
