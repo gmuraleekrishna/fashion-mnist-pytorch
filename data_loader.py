@@ -19,9 +19,9 @@ def load_data(batch_size):
     indices = list(range(num_train))
 
     train_loader = DataLoader(train_set, batch_size=batch_size,
-                              num_workers=2, sampler=SubsetRandomSampler(indices[59000:]))
+                              num_workers=2, sampler=SubsetRandomSampler(indices[:59000]))
 
     val_set = torchvision.datasets.FashionMNIST(root='./', train=False, download=False, transform=transform)
     val_loader = DataLoader(val_set, batch_size=batch_size,
-                            num_workers=2, sampler=SubsetRandomSampler(indices[:1000]))
+                            num_workers=2, sampler=SubsetRandomSampler(indices[59000:]))
     return train_loader, val_loader
