@@ -1,0 +1,4 @@
+FashionMNIST/*
+*.pth
+*.pdf
+.idea/*
