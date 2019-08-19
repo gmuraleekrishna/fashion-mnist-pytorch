@@ -2,3 +2,6 @@ FashionMNIST/*
 *.pth
 *.pdf
 .idea/*
+runs/*
+__pycache__/*
+.DS_Store/*

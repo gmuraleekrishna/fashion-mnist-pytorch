@@ -1,27 +1,47 @@
 import torchvision
 from torchvision import transforms
 from torch.utils.data import *
+import numpy as np
 
-transform = transforms.Compose(
-    [
-        transforms.RandomCrop(28, padding=4, pad_if_needed=False, fill=0, padding_mode='constant'),
-        transforms.Grayscale(num_output_channels=1),
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ToTensor(),
-        transforms.Normalize([0], [1])
-    ]
+train_transform = transforms.Compose(
+	[
+		transforms.RandomCrop(28, padding=4, pad_if_needed=False, fill=0, padding_mode='constant'),
+		transforms.Grayscale(num_output_channels=1),
+		transforms.RandomHorizontalFlip(p=0.5),
+		transforms.ToTensor(),
+		transforms.Normalize([0], [1])
+	]
+)
+
+val_transform = transforms.Compose(
+	[
+		transforms.Grayscale(num_output_channels=1),
+		transforms.ToTensor(),
+	]
 )
 
 
-def load_data(batch_size):
-    train_set = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
-    num_train = len(train_set)
-    indices = list(range(num_train))
+def load_data(batch_size, valid_size=0.02):
+	train_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=train_transform)
+	val_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=False, transform=val_transform)
 
-    train_loader = DataLoader(train_set, batch_size=batch_size,
-                              num_workers=2, sampler=SubsetRandomSampler(indices[:59000]))
+	num_train = len(train_dataset)
+	indices = list(range(num_train))
+	split = int(np.floor(valid_size * num_train))
 
-    val_set = torchvision.datasets.FashionMNIST(root='./', train=False, download=False, transform=transform)
-    val_loader = DataLoader(val_set, batch_size=batch_size,
-                            num_workers=2, sampler=SubsetRandomSampler(indices[59000:]))
-    return train_loader, val_loader
+	train_indices, val_indices = indices[split:], indices[:split]
+
+	train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=2,
+							  sampler=SubsetRandomSampler(train_indices))
+
+	val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=2, sampler=SubsetRandomSampler(val_indices))
+	return train_loader, val_loader
+
+
+def get_test_loader(batch_size, shuffle=True):
+	transform = transforms.Compose([
+		transforms.ToTensor(),
+	])
+	test_dataset =  torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
+	data_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=2, shuffle=shuffle)
+	return data_loader
