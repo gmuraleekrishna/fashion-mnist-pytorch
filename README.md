@@ -28,5 +28,20 @@ Params size (MB): 9.12
 Estimated Total Size (MB): 9.94
 ----------------------------------------------------------------
 ```
+## Setup
+
+1. Clone this repository
+`git clone https://github.com/gmuraleekrishna/fashion-mnist-pytorch.git`
+1. Change directory to `fashion-mnist-pytorch`.
+1. Run `pip install requirements.py` to install the required pachages.
+
+## Training
+
+Run training by running `python mnist_pytorch.py --tensorboard`
+
+## Testing
+
+Run testing by running `python mnist_pytorch.py --test --file fashion-mnist.pth`
+
 
 [1]: https://github.com/zalandoresearch/fashion-mnist
