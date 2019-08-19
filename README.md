@@ -29,4 +29,4 @@ Estimated Total Size (MB): 9.94
 ----------------------------------------------------------------
 ```
 
-![1] https://github.com/zalandoresearch/fashion-mnist
+[1]: https://github.com/zalandoresearch/fashion-mnist
