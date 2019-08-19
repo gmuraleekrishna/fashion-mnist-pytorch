@@ -20,10 +20,16 @@ val_transform = transforms.Compose(
 	]
 )
 
+transform = transforms.Compose([
+	transforms.ToTensor(),
+]
+)
+
 
 def load_data(batch_size, valid_size=0.02):
 	train_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=train_transform)
 	val_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=False, transform=val_transform)
+	test_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
 
 	num_train = len(train_dataset)
 	indices = list(range(num_train))
@@ -31,17 +37,7 @@ def load_data(batch_size, valid_size=0.02):
 
 	train_indices, val_indices = indices[split:], indices[:split]
 
-	train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=2,
-							  sampler=SubsetRandomSampler(train_indices))
-
+	train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=2, sampler=SubsetRandomSampler(train_indices))
 	val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=2, sampler=SubsetRandomSampler(val_indices))
-	return train_loader, val_loader
-
-
-def get_test_loader(batch_size, shuffle=True):
-	transform = transforms.Compose([
-		transforms.ToTensor(),
-	])
-	test_dataset =  torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
-	data_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=2, shuffle=shuffle)
-	return data_loader
+	test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=2, shuffle=True)
+	return train_loader, val_loader, test_loader
