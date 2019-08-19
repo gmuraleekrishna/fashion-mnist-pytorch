@@ -8,7 +8,7 @@ from data_loader import load_data
 import cnn
 
 NUM_EPOCH = 30
-BATCH_SIZE = 500
+BATCH_SIZE = 1000
 
 
 def forward_pass(net, images, labels, optimizer, criterion, train=False):

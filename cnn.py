@@ -14,7 +14,7 @@ class CNN(nn.Module):
 		self.batch_norm2 = nn.BatchNorm2d(num_features=64)  # torch.Size([1, 64, 12, 12])
 		nn.init.xavier_normal_(self.conv2.weight)
 		self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)  # torch.Size([1, 64, 6, 6])
-		self.do1 = nn.Dropout(p=0.1)
+		self.do1 = nn.Dropout(p=0.2)
 		self.fc1 = nn.Linear(64*6*6, 1024)
 		self.relu3 = nn.ReLU()
 		self.fc2 = nn.Linear(in_features=1024, out_features=10)
