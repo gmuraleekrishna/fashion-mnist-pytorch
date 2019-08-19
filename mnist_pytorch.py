@@ -64,9 +64,7 @@ if __name__ == '__main__':
 
 	train_loader, val_loader, test_loader = load_data(BATCH_SIZE)
 
-	if args.cuda:
-		net.to(device)
-
+	net.to(device)
 	if args.summary:
 		summary(net, (1, 28, 28))
 
