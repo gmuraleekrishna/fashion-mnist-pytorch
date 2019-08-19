@@ -45,7 +45,7 @@ if __name__ == '__main__':
 	parser.add_argument('--cuda', dest='cuda', action='store_true', help='use cuda')
 	parser.add_argument('--test', dest='test_only', action='store_true', help='test model')
 	parser.add_argument('--file', dest='test_file', help='test model file')
-	parser.add_argument('--summary', dest='summary', help='show network summary')
+	parser.add_argument('--summary', dest='summary', action='store_true', help='show network summary')
 	parser.add_argument('--tensorboard', dest='tensorboard', action='store_true')
 	args = parser.parse_args()
 
