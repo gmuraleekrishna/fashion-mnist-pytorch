@@ -7,7 +7,7 @@ import numpy as np
 from data_loader import load_data
 import cnn
 
-NUM_EPOCH = 30
+NUM_EPOCH = 5
 BATCH_SIZE = 1000
 
 
@@ -28,7 +28,7 @@ def forward_pass(net, images, labels, optimizer, criterion, train=False):
 def network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False):
 	if args.cuda:
 		images, labels = images.cuda(), labels.cuda()
-		images, labels = Variable(images, volatile=True), Variable(labels, volatile=True)
+		images, labels = Variable(images), Variable(labels)
 	loss, correct, total = forward_pass(net, images, labels, optimizer, criterion, train=train)
 	if train:
 		print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch + 1, NUM_EPOCH, batch_idx + 1,
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 			avg_val_loss = 0
 			for batch_idx, (images, labels) in enumerate(train_loader):
 				if args.cuda:
-					images, labels = images.to(device), labels.to(device)
+					images, labels = Variable(images.cuda()), Variable(labels.cuda())
 				loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=True)
 				avg_acc += (correct / total) * 100
 				avg_loss += loss.item()
