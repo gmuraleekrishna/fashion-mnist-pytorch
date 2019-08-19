@@ -55,7 +55,7 @@ if __name__ == '__main__':
 	net = cnn.CNN()
 	criterion = nn.CrossEntropyLoss()
 	optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
-	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+	device = torch.device('cuda' if torch.cuda.is_available() and args.cuda else 'cpu')
 	lowest_loss = np.Inf
 	if args.tensorboard:
 		from torch.utils.tensorboard import SummaryWriter
