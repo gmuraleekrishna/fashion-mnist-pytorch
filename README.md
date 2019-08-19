@@ -1,6 +1,6 @@
 # fashion-mnist-pytorch
 
-The a simple CNN to classify [fashion mnist][1]. The following network provides 90% test accuracy. On MNIST dataset, the test accuracy is 99.2%.
+A simple CNN to classify [fashion mnist][1] dataset. The following network provides 90% test accuracy. On the MNIST dataset, the test accuracy is 99.2%.
 
 ```
 ----------------------------------------------------------------
