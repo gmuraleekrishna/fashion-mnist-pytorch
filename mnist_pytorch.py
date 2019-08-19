@@ -84,7 +84,7 @@ if __name__ == '__main__':
                     }, 'fashion-mnist.pth')
 
     if args.validate_only:
-        net.load_state_dict(args.validation_file)
+        net.load_state_dict(torch.load(args.validation_file))
         net.eval()
         print('Network loaded')
     for epoch in range(NUM_EPOCH):
