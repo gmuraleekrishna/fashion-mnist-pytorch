@@ -64,7 +64,7 @@ if __name__ == '__main__':
     print('Size of training set: ', len(train_loader))
     print('Size of val set: ', len(val_loader))
 
-    if not args.validation_only:
+    if not args.validate_only:
         for epoch in range(NUM_EPOCH):
             avg_acc = 0
             avg_loss = 0
