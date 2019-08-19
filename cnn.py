@@ -24,7 +24,7 @@ class CNN(nn.Module):
 		x = self.pool1(self.batch_norm1(x))
 		x = self.relu2(self.conv2(x))
 		x = self.pool2(self.batch_norm2(x))
-		# x = self.do1(x)
+		x = self.do1(x)
 		x = x.view(-1, 64*6*6)
 		x = self.relu3(self.fc1(x))
 		x = self.fc2(x)

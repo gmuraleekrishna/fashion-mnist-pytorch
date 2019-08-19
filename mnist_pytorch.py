@@ -3,6 +3,7 @@ from torch import nn, optim  # Contains several Pytorch optimizer classes
 from torch.autograd import Variable
 import argparse
 import numpy as np
+from torchsummary import summary
 
 from data_loader import load_data
 import cnn
@@ -44,6 +45,7 @@ if __name__ == '__main__':
 	parser.add_argument('--cuda', dest='cuda', action='store_true', help='use cuda')
 	parser.add_argument('--test', dest='test_only', action='store_true', help='test model')
 	parser.add_argument('--file', dest='test_file', help='test model file')
+	parser.add_argument('--summary', dest='summary', help='show network summary')
 	parser.add_argument('--tensorboard', dest='tensorboard', action='store_true')
 	args = parser.parse_args()
 
@@ -64,6 +66,9 @@ if __name__ == '__main__':
 
 	if args.cuda:
 		net.to(device)
+
+	if args.summary:
+		summary(net, (1, 28, 28))
 
 	print('Size of training set: ', len(train_loader))
 	print('Size of val set: ', len(val_loader))
