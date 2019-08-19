@@ -21,8 +21,8 @@ val_transform = transforms.Compose(
 )
 
 transform = transforms.Compose([
-	transforms.ToTensor(),
-]
+		transforms.ToTensor(),
+	]
 )
 
 
