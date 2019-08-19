@@ -37,7 +37,7 @@ Estimated Total Size (MB): 9.94
 
 ## Training
 
-Run training by running `python mnist_pytorch.py --tensorboard`
+Run training by running `python mnist_pytorch.py --tensorboard`. Best weights will be saved in `fashion-mnist.pth`.
 
 ## Testing
 
