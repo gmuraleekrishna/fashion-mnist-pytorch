@@ -32,9 +32,8 @@ def network_pass(net, batch_idx, images, labels, optimizer, criterion, train=Fal
 		images, labels = Variable(images), Variable(labels)
 	loss, correct, total = forward_pass(net, images, labels, optimizer, criterion, train=train)
 	if train and batch_idx % 100 == 0:
-		print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch + 1, NUM_EPOCH, batch_idx + 1,
-																					total, loss.item(),
-																					(correct / total) * 100))
+		print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
+		      .format(epoch + 1, NUM_EPOCH, batch_idx + 1, total, loss.item(), (correct / total) * 100))
 	elif not train:
 		print('Val Loss: {:.4f}, Val Accuracy: {:.2f}%'.format(loss.item(), (correct / total) * 100))
 	return loss, correct, total
@@ -59,7 +58,6 @@ if __name__ == '__main__':
 	lowest_loss = np.Inf
 	if args.tensorboard:
 		from torch.utils.tensorboard import SummaryWriter
-
 		writer = SummaryWriter()
 
 	train_loader, val_loader, test_loader = load_data(BATCH_SIZE)
@@ -88,7 +86,7 @@ if __name__ == '__main__':
 					writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch)
 			for batch_idx, (images, labels) in enumerate(val_loader):
 				val_loss, val_correct, val_total = network_pass(net, batch_idx, images, labels, optimizer, criterion,
-																train=False)
+				                                                train=False)
 				avg_val_acc += (val_correct / val_total) * 100
 				avg_val_loss = avg_val_loss * 0.9 + val_loss.item() * 0.1
 				if args.tensorboard:
