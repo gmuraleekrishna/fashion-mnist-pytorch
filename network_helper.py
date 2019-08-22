@@ -26,9 +26,7 @@ def network_pass(net, images, labels, optimizer, criterion, train=False, cuda=Fa
 
 def print_status(batch_idx, epoch, loss, correct, total, num_epochs, train):
 	if train:
-		print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
-		      .format(epoch + 1, num_epochs, batch_idx + 1, total, loss.item(), (correct / total) * 100))
+		print('Epoch [{}/{}], Step {}, Loss: {:.4f}, Accuracy: {:.2f}%'
+		      .format(epoch + 1, num_epochs, batch_idx + 1, loss.item(), (correct / total) * 100))
 	else:
 		print('Val Loss: {:.4f}, Val Accuracy: {:.2f}%'.format(loss.item(), (correct / total) * 100))
-
-

@@ -14,15 +14,16 @@ BATCH_SIZE = 50
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='FashionMNIST on pytorch')
-	parser.add_argument('--cuda', dest='cuda', action='store_true', help='use cuda')
+	parser.add_argument('--cuda', dest='cuda', action='store_true', help='use CUDA')
 	parser.add_argument('--test', dest='test_only', action='store_true', help='test model')
 	parser.add_argument('--file', dest='test_file', help='test model file')
 	parser.add_argument('--summary', dest='summary', action='store_true', help='show network summary')
 	parser.add_argument('--tensorboard', dest='tensorboard', action='store_true')
-	parser.add_argument('--epochs', dest='num_epochs', help='number of epochs', default=NUM_EPOCH)
-	parser.add_argument('--batch_size', dest='batch_size', help='batch size', default=BATCH_SIZE)
+	parser.add_argument('--epoch', dest='num_epochs', help='number of epochs', type=int, default=NUM_EPOCH)
+	parser.add_argument('--batch', dest='batch_size', type=int, help='batch size', default=BATCH_SIZE)
 	args = parser.parse_args()
 
+	print(args.batch_size)
 	if args.test_only and (args.test_file is None):
 		parser.error("--test requires --file")
 
