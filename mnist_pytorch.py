@@ -9,7 +9,7 @@ from data_loader import load_data
 import cnn
 
 NUM_EPOCH = 5
-BATCH_SIZE = 100
+BATCH_SIZE = 50
 
 
 def forward_pass(net, images, labels, optimizer, criterion, train=False):
@@ -112,7 +112,7 @@ if __name__ == '__main__':
 			                                    verbose=False)
 			avg_acc += (correct / total) * 100
 			avg_loss += loss.item()
-		print('Test accuracy: {:d}\n Test Loss: {:d}'.format(avg_acc, avg_loss))
+		print('Test accuracy: {:f}\n Test Loss: {:f}'.format(avg_acc, avg_loss))
 
 if args.tensorboard:
 	writer.close()
