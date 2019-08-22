@@ -40,7 +40,7 @@ def network_pass(net, batch_idx, images, labels, optimizer, criterion, train=Fal
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='MNIST on pytorch')
+	parser = argparse.ArgumentParser(description='FashionMNIST on pytorch')
 	parser.add_argument('--cuda', dest='cuda', action='store_true', help='use cuda')
 	parser.add_argument('--test', dest='test_only', action='store_true', help='test model')
 	parser.add_argument('--file', dest='test_file', help='test model file')

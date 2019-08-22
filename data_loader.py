@@ -1,12 +1,11 @@
 import torchvision
 from torchvision import transforms
-from torch.utils.data import *
+from torch.utils.data import DataLoader
 import numpy as np
 
 train_transform = transforms.Compose(
 	[
 		transforms.RandomCrop(28, padding=4, pad_if_needed=False, fill=0, padding_mode='constant'),
-		transforms.Grayscale(num_output_channels=1),
 		transforms.RandomHorizontalFlip(p=0.5),
 		transforms.ToTensor(),
 		transforms.Normalize([0], [1])
@@ -15,21 +14,21 @@ train_transform = transforms.Compose(
 
 val_transform = transforms.Compose(
 	[
-		transforms.Grayscale(num_output_channels=1),
 		transforms.ToTensor(),
+		transforms.Normalize([0], [1])
 	]
 )
 
 transform = transforms.Compose([
-		transforms.ToTensor(),
+		transforms.ToTensor()
 	]
 )
 
 
 def load_data(batch_size, valid_size=0.02):
-	train_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=train_transform)
-	val_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=False, transform=val_transform)
-	test_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
+	train_dataset = torchvision.datasets.MNIST(root='./', train=True, download=True, transform=train_transform)
+	val_dataset = torchvision.datasets.MNIST(root='./', train=True, download=False, transform=val_transform)
+	test_dataset = torchvision.datasets.MNIST(root='./', train=True, download=True, transform=transform)
 
 	num_train = len(train_dataset)
 	indices = list(range(num_train))

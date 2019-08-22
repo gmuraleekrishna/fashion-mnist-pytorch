@@ -5,7 +5,7 @@ mkl_random=1.0.2=py37h27c97d8_0
 numpy
 pillow
 python=3.7.1
-pytorch=1.2.0=py3.7_0
+pytorch=1.2.0
 tb-nightly
 torchsummary
 torchvision
