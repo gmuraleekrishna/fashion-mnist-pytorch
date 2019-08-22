@@ -7,12 +7,10 @@ class CNN(nn.Module):
 		self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=5, stride=1, padding=1)  # torch.Size([1, 32, 24, 24])
 		self.relu1 = nn.ReLU()  # torch.Size([1, 32, 24, 24])
 		self.batch_norm1 = nn.BatchNorm2d(num_features=32)  # torch.Size([1, 32, 24, 24])
-		nn.init.xavier_normal_(self.conv1.weight)
 		self.pool1 = nn.MaxPool2d(stride=2, kernel_size=(2, 2))  # torch.Size([1, 64, 12, 12])
 		self.conv2 = nn.Conv2d(32, 64, kernel_size=(3, 3), padding=1, stride=1)  # torch.Size([1, 64, 12, 12])
 		self.relu2 = nn.ReLU()  # torch.Size([1, 64, 12, 12])
 		self.batch_norm2 = nn.BatchNorm2d(num_features=64)  # torch.Size([1, 64, 12, 12])
-		nn.init.xavier_normal_(self.conv2.weight)
 		self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)  # torch.Size([1, 64, 6, 6])
 		self.do1 = nn.Dropout(p=0.2)
 		self.fc1 = nn.Linear(64*6*6, 1024)
@@ -29,16 +27,3 @@ class CNN(nn.Module):
 		x = self.relu3(self.fc1(x))
 		x = self.fc2(x)
 		return x
-
-
-# 5×5 Convolutional Layer with 32 filters, stride 1 and padding 1.
-# • ReLU Activation Layer.
-# • Batch Normalization Layer
-# • 2×2 Max Pooling Layer with a stride of 2.
-# • 3×3 Convolutional Layer with 64 filters, stride 1 and padding 1.
-# • ReLU Activation Layer.
-# • Batch Normalization Layer.
-# • 2×2 Max Pooling Layer with a stride of 2.
-# • Fully-connected layer with 1024 output units.
-# • ReLU Activation Layer.
-# • Fully-connected layer with 10 output units.

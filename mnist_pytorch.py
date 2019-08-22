@@ -1,43 +1,16 @@
 import torch
 from torch import nn, optim  # Contains several Pytorch optimizer classes
-from torch.autograd import Variable
 import argparse
 import numpy as np
 from torchsummary import summary
+from torch.autograd import Variable
 
 from data_loader import load_data
 import cnn
+from network_helper import network_pass, print_status
 
 NUM_EPOCH = 5
 BATCH_SIZE = 50
-
-
-def forward_pass(net, images, labels, optimizer, criterion, train=False):
-	outputs = net(images)
-	loss = criterion(outputs, labels)
-	# Backprop and perform Adam optimisation
-	optimizer.zero_grad()
-	if train:
-		loss.backward()
-		optimizer.step()
-	total = labels.size(0)
-	_, predicted = torch.max(outputs.data, 1)
-	correct = (predicted == labels).sum().item()
-	return loss, correct, total
-
-
-def network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False, verbose=False):
-	if args.cuda:
-		images, labels = images.cuda(), labels.cuda()
-		images, labels = Variable(images), Variable(labels)
-	loss, correct, total = forward_pass(net, images, labels, optimizer, criterion, train=train)
-	if train and batch_idx % 50 == 0 and verbose:
-		print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
-		      .format(epoch + 1, NUM_EPOCH, batch_idx + 1, total, loss.item(), (correct / total) * 100))
-	elif not train and verbose:
-		print('Val Loss: {:.4f}, Val Accuracy: {:.2f}%'.format(loss.item(), (correct / total) * 100))
-	return loss, correct, total
-
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='FashionMNIST on pytorch')
@@ -46,6 +19,8 @@ if __name__ == '__main__':
 	parser.add_argument('--file', dest='test_file', help='test model file')
 	parser.add_argument('--summary', dest='summary', action='store_true', help='show network summary')
 	parser.add_argument('--tensorboard', dest='tensorboard', action='store_true')
+	parser.add_argument('--epochs', dest='num_epochs', help='number of epochs', default=NUM_EPOCH)
+	parser.add_argument('--batch_size', dest='batch_size', help='batch size', default=BATCH_SIZE)
 	args = parser.parse_args()
 
 	if args.test_only and (args.test_file is None):
@@ -61,7 +36,7 @@ if __name__ == '__main__':
 
 		writer = SummaryWriter()
 
-	train_loader, val_loader, test_loader = load_data(BATCH_SIZE)
+	train_loader, val_loader, test_loader = load_data(args.batch_size)
 
 	net.to(device)
 	if args.summary:
@@ -79,16 +54,24 @@ if __name__ == '__main__':
 			for batch_id, (train_images, train_labels) in enumerate(train_loader):
 				if args.cuda:
 					train_images, train_labels = Variable(train_images.cuda()), Variable(train_labels.cuda())
-				train_loss, train_correct, train_total = network_pass(net, batch_id, train_images, train_labels,
-				                                                      adam_optimizer, cross_entropy_loss, train=True, verbose=True)
+				train_loss, train_correct, train_total = network_pass(net, train_images, train_labels,
+				                                                      adam_optimizer, cross_entropy_loss,
+				                                                      train=True,
+				                                                      cuda=args.cuda)
+				if batch_id % 50 == 0:
+					print_status(batch_idx=batch_id, correct=train_correct, total=train_total,
+					             num_epochs=args.num_epochs, epoch=epoch, train=True, loss=train_loss)
 				avg_acc += (train_correct / train_total) * 100
 				avg_loss += train_loss.item()
 				if args.tensorboard:
 					writer.add_scalar('Accuracy/train', avg_acc / len(train_loader), epoch)
 					writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch)
 			for batch_id, (val_images, val_labels) in enumerate(val_loader):
-				val_loss, val_correct, val_total = network_pass(net, batch_id, val_images, val_labels, adam_optimizer, cross_entropy_loss,
-				                                                train=False, verbose=True)
+				val_loss, val_correct, val_total = network_pass(net, val_images, val_labels, adam_optimizer,
+				                                                cross_entropy_loss,
+				                                                train=False, cuda=args.cuda)
+				print_status(batch_idx=batch_id, num_epochs=args.num_epochs,
+				             total=val_total, correct=val_correct, train=False, epoch=epoch, loss=val_loss)
 				avg_val_acc += (val_correct / val_total) * 100
 				avg_val_loss = avg_val_loss * 0.9 + val_loss.item() * 0.1
 				if args.tensorboard:
@@ -108,8 +91,8 @@ if __name__ == '__main__':
 	avg_loss = 0.0
 	print()
 	for batch_id, (train_images, train_labels) in enumerate(test_loader):
-		test_loss, test_correct, test_total = network_pass(net, batch_id, train_images, train_labels, adam_optimizer, cross_entropy_loss,
-		                                                   train=False, verbose=False)
+		test_loss, test_correct, test_total = network_pass(net, train_images, train_labels, adam_optimizer,
+		                                                   cross_entropy_loss, train=False, cuda=args.cuda)
 		avg_acc += test_correct
 		avg_loss += test_loss.item()
 	print('Test accuracy: {:.2f}\nTest Loss: {:.2f}'.format(avg_acc / len(test_loader) * 100,
