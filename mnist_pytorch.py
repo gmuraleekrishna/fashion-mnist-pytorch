@@ -52,8 +52,8 @@ if __name__ == '__main__':
 		parser.error("--test requires --file")
 
 	net = cnn.CNN()
-	criterion = nn.CrossEntropyLoss()
-	optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
+	cross_entropy_loss = nn.CrossEntropyLoss()
+	adam_optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
 	device = torch.device('cuda' if torch.cuda.is_available() and args.cuda else 'cpu')
 	lowest_loss = np.Inf
 	if args.tensorboard:
@@ -76,18 +76,18 @@ if __name__ == '__main__':
 			avg_loss = 0
 			avg_val_acc = 0
 			avg_val_loss = 0
-			for batch_idx, (images, labels) in enumerate(train_loader):
+			for batch_id, (train_images, train_labels) in enumerate(train_loader):
 				if args.cuda:
-					images, labels = Variable(images.cuda()), Variable(labels.cuda())
-				loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=True,
-				                                    verbose=True)
-				avg_acc += (correct / total) * 100
-				avg_loss += loss.item()
+					train_images, train_labels = Variable(train_images.cuda()), Variable(train_labels.cuda())
+				train_loss, train_correct, train_total = network_pass(net, batch_id, train_images, train_labels,
+				                                                      adam_optimizer, cross_entropy_loss, train=True, verbose=True)
+				avg_acc += (train_correct / train_total) * 100
+				avg_loss += train_loss.item()
 				if args.tensorboard:
 					writer.add_scalar('Accuracy/train', avg_acc / len(train_loader), epoch)
 					writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch)
-			for batch_idx, (images, labels) in enumerate(val_loader):
-				val_loss, val_correct, val_total = network_pass(net, batch_idx, images, labels, optimizer, criterion,
+			for batch_id, (val_images, val_labels) in enumerate(val_loader):
+				val_loss, val_correct, val_total = network_pass(net, batch_id, val_images, val_labels, adam_optimizer, cross_entropy_loss,
 				                                                train=False, verbose=True)
 				avg_val_acc += (val_correct / val_total) * 100
 				avg_val_loss = avg_val_loss * 0.9 + val_loss.item() * 0.1
@@ -107,12 +107,13 @@ if __name__ == '__main__':
 	avg_acc = 0.0
 	avg_loss = 0.0
 	print()
-	for batch_idx, (images, labels) in enumerate(test_loader):
-		test_loss, test_correct, test_total = network_pass(net, batch_idx, images, labels, optimizer, criterion,
+	for batch_id, (train_images, train_labels) in enumerate(test_loader):
+		test_loss, test_correct, test_total = network_pass(net, batch_id, train_images, train_labels, adam_optimizer, cross_entropy_loss,
 		                                                   train=False, verbose=False)
 		avg_acc += test_correct
 		avg_loss += test_loss.item()
-	print('Test accuracy: {:.2f}\nTest Loss: {:.2f}'.format(avg_acc/len(test_loader) * 100, avg_loss/len(test_loader)))
+	print('Test accuracy: {:.2f}\nTest Loss: {:.2f}'.format(avg_acc / len(test_loader) * 100,
+	                                                        avg_loss / len(test_loader)))
 
 if args.tensorboard:
 	writer.close()
