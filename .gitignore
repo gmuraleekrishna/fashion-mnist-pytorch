@@ -1,4 +1,4 @@
-FashionMNIST/*
+*MNIST/*
 *.pth
 *.pdf
 .idea/*

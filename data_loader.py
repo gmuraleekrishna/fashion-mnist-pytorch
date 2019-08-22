@@ -19,16 +19,17 @@ val_transform = transforms.Compose(
 	]
 )
 
-transform = transforms.Compose([
+test_transform = transforms.Compose(
+	{
 		transforms.ToTensor()
-	]
+	}
 )
 
 
 def load_data(batch_size, valid_size=0.02):
 	train_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=train_transform)
 	val_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=False, transform=val_transform)
-	test_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=transform)
+	test_dataset = torchvision.datasets.FashionMNIST(root='./', train=True, download=True, transform=test_transform)
 
 	num_train = len(train_dataset)
 	indices = list(range(num_train))

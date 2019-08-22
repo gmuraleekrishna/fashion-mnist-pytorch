@@ -8,8 +8,8 @@ from torchsummary import summary
 from data_loader import load_data
 import cnn
 
-NUM_EPOCH = 2
-BATCH_SIZE = 1000
+NUM_EPOCH = 5
+BATCH_SIZE = 100
 
 
 def forward_pass(net, images, labels, optimizer, criterion, train=False):
@@ -26,15 +26,15 @@ def forward_pass(net, images, labels, optimizer, criterion, train=False):
 	return loss, correct, total
 
 
-def network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False):
+def network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False, verbose=False):
 	if args.cuda:
 		images, labels = images.cuda(), labels.cuda()
 		images, labels = Variable(images), Variable(labels)
 	loss, correct, total = forward_pass(net, images, labels, optimizer, criterion, train=train)
-	if train and batch_idx % 100 == 0:
+	if train and batch_idx % 50 == 0 and verbose:
 		print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
 		      .format(epoch + 1, NUM_EPOCH, batch_idx + 1, total, loss.item(), (correct / total) * 100))
-	elif not train:
+	elif not train and verbose:
 		print('Val Loss: {:.4f}, Val Accuracy: {:.2f}%'.format(loss.item(), (correct / total) * 100))
 	return loss, correct, total
 
@@ -58,6 +58,7 @@ if __name__ == '__main__':
 	lowest_loss = np.Inf
 	if args.tensorboard:
 		from torch.utils.tensorboard import SummaryWriter
+
 		writer = SummaryWriter()
 
 	train_loader, val_loader, test_loader = load_data(BATCH_SIZE)
@@ -78,7 +79,8 @@ if __name__ == '__main__':
 			for batch_idx, (images, labels) in enumerate(train_loader):
 				if args.cuda:
 					images, labels = Variable(images.cuda()), Variable(labels.cuda())
-				loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=True)
+				loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=True,
+				                                    verbose=True)
 				avg_acc += (correct / total) * 100
 				avg_loss += loss.item()
 				if args.tensorboard:
@@ -86,7 +88,7 @@ if __name__ == '__main__':
 					writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch)
 			for batch_idx, (images, labels) in enumerate(val_loader):
 				val_loss, val_correct, val_total = network_pass(net, batch_idx, images, labels, optimizer, criterion,
-				                                                train=False)
+				                                                train=False, verbose=True)
 				avg_val_acc += (val_correct / val_total) * 100
 				avg_val_loss = avg_val_loss * 0.9 + val_loss.item() * 0.1
 				if args.tensorboard:
@@ -106,9 +108,11 @@ if __name__ == '__main__':
 		avg_acc = 0
 		avg_loss = 0
 		for batch_idx, (images, labels) in enumerate(test_loader):
-			loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False)
+			loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False,
+			                                    verbose=False)
 			avg_acc += (correct / total) * 100
 			avg_loss += loss.item()
+		print('Test accuracy: {:d}\n Test Loss: {:d}'.format(avg_acc, avg_loss))
 
 if args.tensorboard:
 	writer.close()
