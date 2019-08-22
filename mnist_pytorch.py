@@ -104,15 +104,15 @@ if __name__ == '__main__':
 		net.load_state_dict(torch.load(args.test_file)['model_state_dict'])
 		net.eval()
 		print('Network loaded')
-	for epoch in range(NUM_EPOCH):
-		avg_acc = 0
-		avg_loss = 0
-		for batch_idx, (images, labels) in enumerate(test_loader):
-			loss, correct, total = network_pass(net, batch_idx, images, labels, optimizer, criterion, train=False,
-			                                    verbose=False)
-			avg_acc += (correct / total) * 100
-			avg_loss += loss.item()
-		print('Test accuracy: {:f}\n Test Loss: {:f}'.format(avg_acc, avg_loss))
+	avg_acc = 0.0
+	avg_loss = 0.0
+	print()
+	for batch_idx, (images, labels) in enumerate(test_loader):
+		test_loss, test_correct, test_total = network_pass(net, batch_idx, images, labels, optimizer, criterion,
+		                                                   train=False, verbose=False)
+		avg_acc += test_correct
+		avg_loss += test_loss.item()
+	print('Test accuracy: {:.2f}\nTest Loss: {:.2f}'.format(avg_acc/len(test_loader) * 100, avg_loss/len(test_loader)))
 
 if args.tensorboard:
 	writer.close()
