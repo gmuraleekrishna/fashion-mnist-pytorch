@@ -15,7 +15,7 @@ BATCH_SIZE = 50
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
-def train(net, train_loader, device, writer, tensorboard=False):
+def train(net, train_loader, device, tensorboard=False,  writer=None):
 	avg_acc = 0
 	avg_loss = 0
 	net = net.train()
@@ -35,7 +35,7 @@ def train(net, train_loader, device, writer, tensorboard=False):
 	return avg_acc, avg_loss
 
 
-def eval(net, val_loader, device, writer, tensorboard=False):
+def eval(net, val_loader, device, tensorboard=False, writer=None):
 	avg_acc = 0
 	avg_loss = 0
 	net = net.eval()
@@ -90,6 +90,7 @@ if __name__ == '__main__':
 	adam_optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
 	device = torch.device('cuda' if torch.cuda.is_available() and args.cuda else 'cpu')
 	lowest_loss = np.Inf
+	writer = None
 	if args.tensorboard:
 		from torch.utils.tensorboard import SummaryWriter
 
@@ -121,5 +122,5 @@ if __name__ == '__main__':
 		print('Network loaded')
 	test(net=net, device=device, test_loader=test_loader)
 
-if args.tensorboard:
-	writer.close()
+	if args.tensorboard:
+		writer.close()
