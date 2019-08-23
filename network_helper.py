@@ -2,7 +2,7 @@ from torch.autograd import Variable
 import torch
 
 
-def forward_pass(net, images, labels, optimizer, criterion, train=False):
+def network_pass(net, images, labels, optimizer, criterion, train=False):
 	outputs = net(images)
 	loss = criterion(outputs, labels)
 	# Backprop and perform Adam optimisation
@@ -13,14 +13,6 @@ def forward_pass(net, images, labels, optimizer, criterion, train=False):
 	total = labels.size(0)
 	_, predicted = torch.max(outputs.data, 1)
 	correct = (predicted == labels).sum().item()
-	return loss, correct, total
-
-
-def network_pass(net, images, labels, optimizer, criterion, train=False, cuda=False):
-	if cuda:
-		images, labels = images.cuda(), labels.cuda()
-		images, labels = Variable(images), Variable(labels)
-	loss, correct, total = forward_pass(net, images, labels, optimizer, criterion, train=train)
 	return loss, correct, total
 
 
