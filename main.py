@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 from torchsummary import summary
 from torch.autograd import Variable
+import os
 
 from data_loader import load_data
 import cnn

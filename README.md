@@ -38,11 +38,11 @@ Estimated Total Size (MB): 9.96
 
 ## Training
 
-Run training by running `python mnist_pytorch.py --tensorboard`. Best weights will be saved in `fashion-mnist.pth`.
+Run training by running `python main.py --tensorboard`. Best weights will be saved in `fashion-mnist.pth`.
 
 ## Testing
 
-Run testing by running `python mnist_pytorch.py --test --file fashion-mnist.pth`
+Run testing by running `python main.py --test --file fashion-mnist.pth`
 
 
 [1]: https://github.com/zalandoresearch/fashion-mnist
