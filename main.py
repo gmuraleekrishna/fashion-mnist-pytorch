@@ -15,7 +15,8 @@ BATCH_SIZE = 50
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
-def train(net, train_loader, device, tensorboard=False,  writer=None):
+
+def train(net, train_loader, device, tensorboard=False, writer=None):
 	avg_acc = 0
 	avg_loss = 0
 	net = net.train()
@@ -35,7 +36,7 @@ def train(net, train_loader, device, tensorboard=False,  writer=None):
 	return avg_acc, avg_loss
 
 
-def eval(net, val_loader, device, tensorboard=False, writer=None):
+def evaluate(net, val_loader, device, tensorboard=False, writer=None):
 	avg_acc = 0
 	avg_loss = 0
 	net = net.eval()
@@ -47,7 +48,7 @@ def eval(net, val_loader, device, tensorboard=False, writer=None):
 			print_status(batch_idx=batch_id, num_epochs=args.num_epochs,
 			             total=val_total, correct=val_correct, train=False, epoch=epoch, loss=val_loss)
 			avg_acc += (val_correct / val_total) * 100
-			avg_loss = avg_val_loss * 0.9 + val_loss.item() * 0.1
+			avg_loss = avg_loss * 0.9 + val_loss.item() * 0.1
 			if tensorboard:
 				writer.add_scalar('Accuracy/Val', avg_acc / len(val_loader), epoch)
 				writer.add_scalar('Loss/Val', avg_loss, epoch)
@@ -67,7 +68,7 @@ def test(net, device, test_loader):
 		avg_loss += test_loss.item()
 	print('====================================================')
 	print('Test accuracy: {:.2f}%\nTest Loss: {:.2f}'.format(avg_acc / len(test_loader) * 100,
-	                                                        avg_loss / len(test_loader)))
+	                                                         avg_loss / len(test_loader)))
 
 
 if __name__ == '__main__':
@@ -108,9 +109,9 @@ if __name__ == '__main__':
 	if not args.test_only:
 		for epoch in range(NUM_EPOCH):
 			avg_train_acc, avg_train_loss = train(net=net, device=device, train_loader=train_loader, writer=writer,
-			                          tensorboard=args.tensorboard)
-			avg_val_acc, avg_val_loss = eval(net=net, device=device,
-			                                 val_loader=val_loader, writer=writer, tensorboard=args.tensorboard)
+			                                      tensorboard=args.tensorboard)
+			avg_val_acc, avg_val_loss = evaluate(net=net, device=device,
+			                                     val_loader=val_loader, writer=writer, tensorboard=args.tensorboard)
 			if avg_val_loss < lowest_loss:
 				lowest_loss = avg_val_loss
 				torch.save({
