@@ -52,6 +52,7 @@ if __name__ == '__main__':
 			avg_loss = 0
 			avg_val_acc = 0
 			avg_val_loss = 0
+			net = net.train()
 			for batch_id, (train_images, train_labels) in enumerate(train_loader):
 				if args.cuda:
 					train_images, train_labels = Variable(train_images.cuda()), Variable(train_labels.cuda())
@@ -67,6 +68,7 @@ if __name__ == '__main__':
 				if args.tensorboard:
 					writer.add_scalar('Accuracy/train', avg_acc / len(train_loader), epoch)
 					writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch)
+			net = net.eval()
 			for batch_id, (val_images, val_labels) in enumerate(val_loader):
 				val_loss, val_correct, val_total = network_pass(net, val_images, val_labels, adam_optimizer,
 				                                                cross_entropy_loss,
@@ -86,8 +88,8 @@ if __name__ == '__main__':
 
 	if args.test_only:
 		net.load_state_dict(torch.load(args.test_file)['model_state_dict'])
-		net.eval()
 		print('Network loaded')
+	net.eval()
 	avg_acc = 0.0
 	avg_loss = 0.0
 	print()
