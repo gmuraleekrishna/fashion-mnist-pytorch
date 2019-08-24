@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 from torchsummary import summary
 import os
+from tensorboardX import SummaryWriter
 
 from data_loader import load_data
 import new_cnn as cnn
@@ -41,8 +42,6 @@ if __name__ == '__main__':
 	lowest_loss = np.Inf
 	writer = None
 	if args.tensorboard:
-		from torch.utils.tensorboard import SummaryWriter
-
 		writer = SummaryWriter()
 
 	train_loader, val_loader, test_loader = load_data(args.batch_size)
