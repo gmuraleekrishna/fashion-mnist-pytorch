@@ -2,7 +2,7 @@ import torch
 from torch import nn, optim  # Contains several Pytorch optimizer classes
 import argparse
 import numpy as np
-from tensorboardX import summary
+from torchsummary import summary
 import os
 
 from data_loader import load_data
