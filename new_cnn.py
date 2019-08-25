@@ -1,6 +1,6 @@
 from torch import nn
 
-# --summary --cuda --drops 0.25 0.25 0.5 --epoch 15 --batch 50 Test accuracy: 93.14%%
+# --summary --cuda --drops 0.25 0.25 0.5 --epoch 15 --batch 50 Test accuracy: 93.05%
 # Test Loss: 0.21
 
 

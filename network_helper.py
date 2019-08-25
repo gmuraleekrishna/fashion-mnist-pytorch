@@ -55,9 +55,9 @@ def train(net, train_loader, device, optimizer, loss_criterion, num_epochs, epoc
 				             num_epochs=num_epochs, batch_idx=batch_id, epoch=epoch, train=True, loss=train_loss)
 			avg_acc += (train_correct / train_total) * 100
 			avg_loss += train_loss.item()
-			if tensorboard:
-				writer.add_scalar('Accuracy/train', avg_acc / len(train_loader), epoch)
-				writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch)
+	if tensorboard:
+		writer.add_scalar('Accuracy/train', avg_acc / len(train_loader), epoch + 1)
+		writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch + 1)
 	return avg_acc, avg_loss
 
 
@@ -72,8 +72,8 @@ def evaluate(net, val_loader, device, epoch, loss_criterion, tensorboard=False, 
 			                                                loss_criterion=loss_criterion)
 			avg_acc += (val_correct / val_total) * 100
 			avg_loss = avg_loss * 0.9 + val_loss.item() * 0.1
-			if tensorboard:
-				writer.add_scalar('Accuracy/Val', avg_acc / len(val_loader), epoch)
-				writer.add_scalar('Loss/Val', avg_loss, epoch)
+		if tensorboard:
+			writer.add_scalar('Accuracy/Val', avg_acc / len(val_loader), epoch + 1)
+			writer.add_scalar('Loss/Val', avg_loss, epoch + 1)
 	print_status(total=val_total, correct=val_correct, train=False, loss=val_loss)
 	return avg_acc, avg_loss

@@ -4,17 +4,14 @@ import argparse
 import numpy as np
 from torchsummary import summary
 import os
-from tensorboardX import SummaryWriter
+from summarywriter import SummaryWriter
 
 from data_loader import load_data
-import new_cnn as cnn
+import cnn as cnn
 from network_helper import train, evaluate, test
 
 NUM_EPOCH = 5
 BATCH_SIZE = 50
-
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-os.environ['OMP_NUM_THREADS'] = '1'
 
 
 if __name__ == '__main__':
@@ -42,7 +39,8 @@ if __name__ == '__main__':
 	lowest_loss = np.Inf
 	writer = None
 	if args.tensorboard:
-		writer = SummaryWriter()
+		home = os.environ['HOME']
+		writer = SummaryWriter(home + '/25Aug_cnn_new.json')
 
 	train_loader, val_loader, test_loader = load_data(args.batch_size)
 
