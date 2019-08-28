@@ -1,79 +1,82 @@
 import torch
 
 
-def network_pass(net, images, labels, loss_criterion, optimizer=None, train=False):
-	outputs = net(images)
-	loss = loss_criterion(outputs, labels)
-	# Backprop and perform Adam optimisation
-	if train:
-		optimizer.zero_grad()
-		loss.backward()
-		optimizer.step()
-	total = labels.size(0)
-	_, predicted = torch.max(outputs.data, 1)
-	correct = (predicted == labels).sum().item()
-	return loss, correct, total
+class CNNForwardBase:
+	# def __init__(self, model, loader, optimizer, loss_function, scheduler, device, epochs):
+	def __init__(self, model, loader, optimizer, loss_function, device, writer):
+		""" Instantiate a CNNForwardBase object
+		Args:
+			model: This is a torch.nn.Module implemented object
+			loader: Dictionary with torch.util.data.DataLoader object as values, keys must be ['train', 'val']
+			optimizer: torch.optim type optimizer
+			loss_function: any torch criterion function typically, torch.nn.CrossEntropy()
+			device: torch.device
+			writer: Writer object- Custom or Tensorboard writer
+		"""
+		
+		self.model = model
+		self.loader = loader
+		self.optimizer = optimizer
+		self.loss_function = loss_function
+		self.device = device
+		self.writer = writer
+	
+	def train(self, epoch):
+		return NotImplementedError
+	
+	def evaluate(self, epoch):
+		return NotImplementedError
+	
+	def network_pass(self, images, targets):
+		outputs = self.model(images)
+		loss = self.loss_function(outputs, targets)
+		total = targets.size(0)
+		_, predicted = torch.max(outputs.data, 1)
+		correct = (predicted == targets).sum().item()
+		return loss, correct, total
 
 
-def print_status(loss, correct, total, train, batch_idx=0, epoch=0, num_epochs=0):
-	if train:
-		print('Epoch [{}/{}], Step {}, Loss: {:.4f}, Accuracy: {:.2f}%'
-		      .format(epoch + 1, num_epochs, batch_idx + 1, loss.item(), (correct / total) * 100))
-	else:
-		print('Val Loss: {:.4f}, Val Accuracy: {:.2f}%'.format(loss.item(), (correct / total) * 100))
+class Trainer(CNNForwardBase):
+	def __init__(self, model, loader, optimizer, loss_function, device, writer):
+		super(Trainer, self).__init__(model, loader, optimizer, loss_function, device, writer)
+	
+	def train(self, epoch):
+		avg_acc = 0
+		avg_loss = 0
+		with torch.set_grad_enabled(True):
+			for batch_id, (train_images, train_labels) in enumerate(self.loader):
+				images, targets = train_images.to(self.device), train_labels.to(self.device).long()
+				self.optimizer.zero_grad()
+				loss, correct, total = self.network_pass(images=images, targets=targets)
+				self.optimizer.zero_grad()
+				loss.backward()
+				self.optimizer.step()
+				avg_acc += (correct / total) * 100
+				avg_loss += loss.item()
+			self.writer.add_scalar('Train Accuracy', avg_acc / len(self.loader), epoch + 1)
+			self.writer.add_scalar('Train Loss', loss.item(), epoch + 1)
+		return avg_acc / len(self.loader), loss.item()
 
 
-def test(net, device, test_loader, loss_criterion):
-	net.eval()
-	avg_acc = 0
-	avg_loss = 0
-	with torch.no_grad():
-		for batch_id, (test_images, test_labels) in enumerate(test_loader):
-			test_images, test_labels = test_images.to(device), test_labels.to(device).long()
-			test_loss, test_correct, test_total = network_pass(net, images=test_images, labels=test_labels,
-			                                                   loss_criterion=loss_criterion, train=False)
-			avg_acc += test_correct
-			avg_loss += test_loss.item()
-	print('====================================================')
-	print('Test accuracy: {:.2f}%\nTest Loss: {:.2f}'.format(avg_acc / len(test_loader) * 100,
-	                                                         avg_loss / len(test_loader)))
+class Evaluator(CNNForwardBase):
+	def __init__(self, model, loader, loss_function, device, writer=None, is_test=False):
+		super(Evaluator, self).__init__(model, loader, None, loss_function, device, writer)
+		self.model = self.model.eval()
+		self.is_test = is_test
+	
+	def evaluate(self, epoch=None):
+		avg_acc = 0
+		avg_loss = 0
+		with torch.no_grad():
+			for batch_id, (images, targets) in enumerate(self.loader):
+				images, targets = images.to(self.device), targets.to(self.device).long()
+				loss, correct, total = self.network_pass(images, targets)
+				avg_acc += (correct / total) * 100
+				avg_loss += loss.item() / total
+				if not self.is_test:
+					self.writer.add_scalar('Val Accuracy', avg_acc / len(self.loader), epoch + 1)
+					self.writer.add_scalar('Val Loss', loss.item(), epoch + 1)
+		return avg_acc / len(self.loader), avg_loss / len(self.loader)
 
 
-def train(net, train_loader, device, optimizer, loss_criterion, num_epochs, epoch, tensorboard=False, writer=None):
-	avg_acc = 0
-	avg_loss = 0
-	net = net.train()
-	with torch.set_grad_enabled(True):
-		for batch_id, (train_images, train_labels) in enumerate(train_loader):
-			train_images, train_labels = train_images.to(device), train_labels.to(device).long()
-			optimizer.zero_grad()
-			train_loss, train_correct, train_total = network_pass(net, images=train_images, labels=train_labels,
-			                                                      optimizer=optimizer, loss_criterion=loss_criterion,
-			                                                      train=True)
-			if batch_id % 50 == 0:
-				print_status( correct=train_correct, total=train_total,
-				             num_epochs=num_epochs, batch_idx=batch_id, epoch=epoch, train=True, loss=train_loss)
-			avg_acc += (train_correct / train_total) * 100
-			avg_loss += train_loss.item()
-	if tensorboard:
-		writer.add_scalar('Accuracy/train', avg_acc / len(train_loader), epoch + 1)
-		writer.add_scalar('Loss/train', avg_loss / len(train_loader), epoch + 1)
-	return avg_acc, avg_loss
 
-
-def evaluate(net, val_loader, device, epoch, loss_criterion, tensorboard=False, writer=None):
-	avg_acc = 0
-	avg_loss = 0
-	net = net.eval()
-	with torch.no_grad():
-		for batch_id, (val_images, val_labels) in enumerate(val_loader):
-			val_images, val_labels = val_images.to(device), val_labels.to(device).long()
-			val_loss, val_correct, val_total = network_pass(net, images=val_images, labels=val_labels, train=False,
-			                                                loss_criterion=loss_criterion)
-			avg_acc += (val_correct / val_total) * 100
-			avg_loss = avg_loss * 0.9 + val_loss.item() * 0.1
-		if tensorboard:
-			writer.add_scalar('Accuracy/Val', avg_acc / len(val_loader), epoch + 1)
-			writer.add_scalar('Loss/Val', avg_loss, epoch + 1)
-	print_status(total=val_total, correct=val_correct, train=False, loss=val_loss)
-	return avg_acc, avg_loss
