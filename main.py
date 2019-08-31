@@ -1,10 +1,10 @@
 import torch
-from torch import nn, optim  # Contains several Pytorch optimizer classes
+from torch import nn, optim
 import argparse
-import numpy as np
 from torchsummary import summary
 import os
 from summarywriter import SummaryWriter
+import numpy as np
 
 from data_loader import load_data
 import cnn as cnn
@@ -17,7 +17,6 @@ BATCH_SIZE = 50
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='FashionMNIST on pytorch')
-	parser.add_argument('--cuda', dest='cuda', action='store_true', help='use CUDA', default=False)
 	parser.add_argument('--test', dest='test_only', action='store_true', help='test model', default=False)
 	parser.add_argument('--file', dest='test_file', help='test model file')
 	parser.add_argument('--summary', dest='summary', action='store_true', help='show network summary', default=False)
@@ -30,12 +29,11 @@ if __name__ == '__main__':
 
 	model = cnn.CNN()
 	cross_entropy_loss = nn.CrossEntropyLoss()
-	adam_optimizer = optim.Adam(model.parameters(), lr=1e-3, betas=(0.9, 0.999))
-	device = torch.device('cuda' if torch.cuda.is_available() and args.cuda else 'cpu')
-	lowest_loss = np.Inf
+	adam_optimizer = optim.Adam(model.parameters(), lr=1e-2, betas=(0.9, 0.999))
+	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 	home = os.environ['HOME']
 	writer = SummaryWriter(home + '/25Aug_cnn_new.json')
-
+	lowest_loss = np.Inf
 	train_loader, val_loader, test_loader = load_data(args.batch_size)
 
 	model.to(device)
@@ -45,8 +43,7 @@ if __name__ == '__main__':
 		print('Batch size: ',  args.batch_size)
 		print('Epochs:', args.num_epochs)
 	
-	trainer = Trainer(model=model, device=device, optimizer=adam_optimizer,
-			                                      loader=train_loader, writer=writer,
+	trainer = Trainer(model=model, device=device, optimizer=adam_optimizer, loader=train_loader, writer=writer,
 			                                      loss_function=cross_entropy_loss)
 	evaluator = Evaluator(model=model, device=device, loader=val_loader, writer=writer,
 			                                      loss_function=cross_entropy_loss)

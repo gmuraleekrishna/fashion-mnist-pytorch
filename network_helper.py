@@ -39,6 +39,7 @@ class CNNForwardBase:
 class Trainer(CNNForwardBase):
 	def __init__(self, model, loader, optimizer, loss_function, device, writer):
 		super(Trainer, self).__init__(model, loader, optimizer, loss_function, device, writer)
+		self.model.train()
 	
 	def train(self, epoch):
 		avg_acc = 0
@@ -51,11 +52,18 @@ class Trainer(CNNForwardBase):
 				self.optimizer.zero_grad()
 				loss.backward()
 				self.optimizer.step()
+				self._adjust_learning_rate(epoch)
 				avg_acc += (correct / total) * 100
-				avg_loss += loss.item()
+				avg_loss += loss.item() / total
 			self.writer.add_scalar('Train Accuracy', avg_acc / len(self.loader), epoch + 1)
 			self.writer.add_scalar('Train Loss', loss.item(), epoch + 1)
-		return avg_acc / len(self.loader), loss.item()
+		return avg_acc / len(self.loader), avg_loss / len(self.loader)
+	
+	def _adjust_learning_rate(self, epoch):
+		if epoch % 10 == 0:
+			lr = 0.001 / 10**(epoch % 10)
+			for param_group in self.optimizer.param_groups:
+				param_group["lr"] = lr
 
 
 class Evaluator(CNNForwardBase):
@@ -77,6 +85,7 @@ class Evaluator(CNNForwardBase):
 					self.writer.add_scalar('Val Accuracy', avg_acc / len(self.loader), epoch + 1)
 					self.writer.add_scalar('Val Loss', loss.item(), epoch + 1)
 		return avg_acc / len(self.loader), avg_loss / len(self.loader)
+
 
 
 
