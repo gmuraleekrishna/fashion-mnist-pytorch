@@ -8,11 +8,11 @@ class SummaryWriter:
 		
 	def add_scalar(self, key, scalar, epoch):
 		dic = dict()
-		dic[epoch] = scalar
 		if key not in self.container:
-			self.container[key] = [dic]
+			dic[epoch] = scalar
+			self.container[key] = dic
 		else:
-			self.container[key].append(dic)
+			self.container[key][epoch] = scalar
 		
 	def close(self):
 		with open(self.filename, 'w+') as json_file:

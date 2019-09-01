@@ -20,10 +20,10 @@ val_transform = transforms.Compose(
 )
 
 test_transform = transforms.Compose(
-	{
+	[
 		transforms.ToTensor(),
 		transforms.Normalize([0.5], [0.5])
-	}
+	]
 )
 
 
@@ -41,5 +41,5 @@ def load_data(batch_size, valid_size=0.02):
 	train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=2,
 	                          sampler=SubsetRandomSampler(train_indices))
 	val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=2, sampler=SubsetRandomSampler(val_indices))
-	test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=4, shuffle=False)
+	test_loader = DataLoader(test_dataset, batch_size=5, num_workers=2, shuffle=False)
 	return train_loader, val_loader, test_loader
